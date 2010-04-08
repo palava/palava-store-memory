@@ -20,10 +20,11 @@
 
 package de.cosmocode.palava.store;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,57 +32,68 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
 
 /**
  * Memory based implementation of the {@link Store} interface.
- *
+ * 
  * @author Willi Schoenborn
  */
-final class MemoryStore implements Store {
+final class MemoryStore extends AbstractByteStore implements ByteStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemoryStore.class);
     
-    private final ConcurrentMap<UUID, byte[]> map = new MapMaker().makeMap();
+    private final ConcurrentMap<String, byte[]> map = new MapMaker().makeMap();
 
     @Override
     public String create(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream, "Stream");
-        final UUID uuid = UUID.randomUUID();
+        final String uuid = UUID.randomUUID().toString();
+        create(stream, uuid);
+        return uuid;
+    }
+    
+    @Override
+    public void create(InputStream stream, String identifier) throws IOException {
+        Preconditions.checkNotNull(stream, "Stream");
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         IOUtils.copy(stream, output);
         final byte[] data = output.toByteArray();
-        LOG.trace("Storing {} to {}", stream, uuid);
-        map.put(uuid, data);
+        LOG.trace("Storing {} to {}", stream, identifier);
+        map.put(identifier, data);
+    }
+
+    @Override
+    public ByteBuffer view(String identifier) throws IOException {
+        Preconditions.checkNotNull(identifier, "Identifier");
+
+        LOG.trace("Reading data from {}", identifier);
+        final byte[] data = map.get(identifier);
         
-        return uuid.toString();
+        if (data == null) {
+            throw new IOException(String.format("Unknown identifier %s", identifier));
+        } else {
+            return ByteBuffer.wrap(data);
+        }
     }
     
     @Override
-    public InputStream read(String identifier) throws IOException {
-        Preconditions.checkNotNull(identifier, "Identifier");
-        final UUID uuid = UUID.fromString(identifier);
-
-        LOG.trace("Reading data from {}", uuid);
-        final byte[] data = map.get(uuid);
-        
-        if (data == null) {
-            throw new IOException(String.format("Unknown identifier %s", uuid));
-        } else {
-            return new ByteArrayInputStream(data);
-        }
+    public Set<String> list() throws IOException {
+        return Sets.newHashSet(Collections2.transform(map.keySet(), Functions.toStringFunction()));
     }
     
     @Override
     public void delete(String identifier) throws IOException {
         Preconditions.checkNotNull(identifier, "Identifier");
-        final UUID uuid = UUID.fromString(identifier);
 
-        LOG.trace("Removing {} from store", uuid);
-        if (map.remove(uuid) == null) {
-            throw new IOException(String.format("Unknown identifier %s", uuid));
+        LOG.trace("Removing {} from store", identifier);
+        if (map.remove(identifier) == null) {
+            throw new IOException(String.format("Unknown identifier %s", identifier));
         }
     }
     

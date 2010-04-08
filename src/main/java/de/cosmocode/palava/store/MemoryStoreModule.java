@@ -33,7 +33,8 @@ public final class MemoryStoreModule implements Module {
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(Store.class).to(MemoryStore.class).in(Singleton.class);
+        binder.bind(ByteStore.class).to(MemoryStore.class).in(Singleton.class);
+        binder.bind(Store.class).to(ByteStore.class).in(Singleton.class);
     }
 
 }
