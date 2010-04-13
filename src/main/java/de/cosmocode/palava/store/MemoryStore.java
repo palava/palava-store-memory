@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.io.IOUtils;
@@ -37,6 +36,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 
 /**
  * Memory based implementation of the {@link Store} interface.
@@ -49,10 +49,17 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     
     private final ConcurrentMap<String, byte[]> map = new MapMaker().makeMap();
 
+    private IdGenerator generator = new UUIDGenerator();
+    
+    @Inject(optional = true)
+    void setGenerator(IdGenerator generator) {
+        this.generator = Preconditions.checkNotNull(generator, "Generator");
+    }
+    
     @Override
     public String create(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream, "Stream");
-        final String uuid = UUID.randomUUID().toString();
+        final String uuid = generator.generate();
         create(stream, uuid);
         return uuid;
     }
