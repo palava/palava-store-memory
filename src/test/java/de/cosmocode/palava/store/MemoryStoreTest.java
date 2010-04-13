@@ -28,8 +28,15 @@ package de.cosmocode.palava.store;
 public final class MemoryStoreTest extends AbstractStoreTest {
 
     @Override
-    public Store unit() {
+    public MemoryStore unit() {
         return new MemoryStore();
+    }
+    
+    @Override
+    protected Store unitWithGenerator(IdGenerator generator) {
+        final MemoryStore unit = unit();
+        unit.setGenerator(generator);
+        return unit;
     }
 
 }
