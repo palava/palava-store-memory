@@ -60,6 +60,7 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     @Override
     public void create(InputStream stream, String identifier) throws IOException {
         Preconditions.checkNotNull(stream, "Stream");
+        Preconditions.checkState(map.get(identifier) == null, "Byte array for %s already present", identifier);
         
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         IOUtils.copy(stream, output);
