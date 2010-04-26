@@ -64,7 +64,6 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     public void create(InputStream stream, String identifier) throws IOException {
         Preconditions.checkNotNull(stream, "Stream");
         Preconditions.checkState(map.get(identifier) == null, "Byte array for %s already present", identifier);
-        
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         IOUtils.copy(stream, output);
         final byte[] data = output.toByteArray();
@@ -75,15 +74,10 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     @Override
     public ByteBuffer view(String identifier) throws IOException {
         Preconditions.checkNotNull(identifier, "Identifier");
-
         LOG.trace("Reading data from {}", identifier);
         final byte[] data = map.get(identifier);
-        
-        if (data == null) {
-            throw new IOException(String.format("Unknown identifier %s", identifier));
-        } else {
-            return ByteBuffer.wrap(data);
-        }
+        Preconditions.checkState(data != null, "Unknown identifier %s", identifier);
+        return ByteBuffer.wrap(data);
     }
     
     @Override
@@ -94,11 +88,8 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     @Override
     public void delete(String identifier) throws IOException {
         Preconditions.checkNotNull(identifier, "Identifier");
-
         LOG.trace("Removing {} from store", identifier);
-        if (map.remove(identifier) == null) {
-            throw new IOException(String.format("Unknown identifier %s", identifier));
-        }
+        Preconditions.checkState(map.remove(identifier) != null, "Unknown identifier %s", identifier);
     }
     
 }
