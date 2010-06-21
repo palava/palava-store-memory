@@ -8,9 +8,9 @@
   <groupId>de.cosmocode.palava</groupId>
   <artifactId>palava-store-memory</artifactId>
   <name>Palava Store Memory</name>
-  <version>1.1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scm>
-    <developerConnection>scm:svn:https://palava.svn.cosmocode.de/palava-store-memory/tags/1.1.1</developerConnection>
+    <developerConnection>scm:svn:https://palava.svn.cosmocode.de/palava-store-memory/trunk</developerConnection>
   </scm>
   <repositories>
     <repository>
