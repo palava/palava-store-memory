@@ -55,9 +55,9 @@ final class MemoryStore extends AbstractByteStore implements ByteStore {
     @Override
     public String create(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream, "Stream");
-        final String uuid = generator.generate();
-        create(stream, uuid);
-        return uuid;
+        final String identifier = generator.generate();
+        create(stream, identifier);
+        return identifier;
     }
     
     @Override

@@ -21,7 +21,7 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 
 /**
- * Binds the {@link Store} interface to {@link MemoryStore}.
+ * Binds {@link Store} and {@link ByteStore} to {@link MemoryStore}.
  *
  * @author Willi Schoenborn
  */
