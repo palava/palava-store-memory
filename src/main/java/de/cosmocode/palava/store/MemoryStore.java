@@ -39,7 +39,7 @@ import com.google.inject.Inject;
  * 
  * @author Willi Schoenborn
  */
-final class MemoryStore extends AbstractByteStore implements ByteStore {
+final class MemoryStore extends AbstractByteStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemoryStore.class);
     
